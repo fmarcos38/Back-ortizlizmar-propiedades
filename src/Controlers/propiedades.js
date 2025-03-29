@@ -18,7 +18,7 @@ const url = process.env.URL;
 
 //trae propiedades
 const getProperties = async (req, res) => {
-    const { limit = 12, offset = 0, operacion, tipo, ambientes, precioMin, precioMax } = req.query;
+    const { operacion, tipo, precioMin, precioMax, limit = 12, offset = 0 } = req.query;
 
     try {
         let propiedades = [];
@@ -29,7 +29,7 @@ const getProperties = async (req, res) => {
         // Recuperar todas las propiedades disponibles desde la API
         do {
             const resp = await axios.get(`${url}&limit=${fetchLimit}&offset=${currentOffset}&key=${apiKey}`);
-            const fetchedProps = normalizaProps(resp.data.objects); //normalizo data
+            const fetchedProps = normalizaProps(resp.data.objects);
             propiedades = [...propiedades, ...fetchedProps];
             fetchedCount = fetchedProps.length;
             currentOffset += fetchLimit;
@@ -44,10 +44,6 @@ const getProperties = async (req, res) => {
 
         if (tipo && tipo !== 'todas') {
             propiedades = propiedades.filter((p) => p.tipo.nombre === tipo);
-        }
-
-        if (ambientes && Number(ambientes) !== 0) {
-            propiedades = propiedades.filter((p) => p.ambientes === Number(ambientes));
         }
 
         if (precioMin || precioMax) {
