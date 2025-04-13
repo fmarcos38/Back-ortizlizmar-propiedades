@@ -19,7 +19,7 @@ const url = process.env.URL;
 //trae propiedades
 const getProperties = async (req, res) => {
     const { operacion, tipo, precioMin, precioMax, limit = 12, offset = 0, ambientes } = req.query;
-    console.log("data:",req.query);
+    
     try {
         let propiedades = [];
         let fetchedCount = 0;
@@ -60,10 +60,10 @@ const getProperties = async (req, res) => {
             );
         }
         //si tengo ambientes
-        if (ambientes !== 'mas') {
+        if (ambientes && ambientes !== 'mas') {
             propiedades = propiedades.filter((p) => p.ambientes === Number(ambientes));
         }
-        if (ambientes === 'mas') {
+        if (ambientes && ambientes === 'mas') {
             propiedades = propiedades.filter((p) => p.ambientes >= 5);
         }
         // Filtrar propiedades que NO son de Argentina
