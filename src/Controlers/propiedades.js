@@ -18,8 +18,8 @@ const url = process.env.URL;
 
 //trae propiedades
 const getProperties = async (req, res) => {
-    const { operacion, tipo, precioMin, precioMax, limit = 12, offset = 0, ambientes } = req.query;
-    
+    const { operacion, tipo, precioMin, precioMax, limit = 12, offset = 0, ambientes, destacadas } = req.query;
+    /* console.log("data: ", req.query) */
     try {
         let propiedades = [];
         let fetchedCount = 0;
@@ -36,13 +36,13 @@ const getProperties = async (req, res) => {
         } while (fetchedCount === fetchLimit); // Continúa hasta que no se reciban más propiedades
 
         // Aplicar filtros
-        if (operacion) {
+        if (operacion && operacion !== 'Todas') {
             propiedades = propiedades.filter((p) =>
                 p.operacion.some((item) => item.operacion === operacion)
             );
         }
 
-        if (tipo && tipo !== 'todas') {
+        if (tipo && tipo !== 'Todas') {
             propiedades = propiedades.filter((p) => p.tipo.nombre === tipo);
         }
 
@@ -72,8 +72,27 @@ const getProperties = async (req, res) => {
                 !/\bargentina\b/i.test(p.ubicacion.ubicacion)
             );
         } */
+        if(destacadas){
+            propiedades = propiedades.filter(p => p.destacadaEnWeb === true)
+        }
 
         const total = propiedades.length;
+
+        //armo un nuevo array con las props destacadas primero
+        let propsDestacadas = []; 
+        let propsNoDestacadas = []; 
+        let newProps = [];
+
+        newProps = propiedades?.map(p => {
+            if(p.destacadaEnWeb === true){
+                propsDestacadas.push(p)
+            }else{
+                propsNoDestacadas.push(p)
+            }
+        })
+
+        //concateno ambos nuevos array
+        propiedades = propsDestacadas.concat(propsNoDestacadas);
 
         // Paginación (de a 12 propiedades por página)
         const paginatedProperties = propiedades.slice(
